@@ -1,15 +1,15 @@
 # Forum975
 Forum for a software engeneering class
 
-##TO INSTALL :
+## TO INSTALL :
 
-###1.Instalação do Node.js: https://nodejs.org
+### 1.Instalação do Node.js: https://nodejs.org
 > sudo su
  apt-get install nodejs
  apt-get install npm
 
 
-###2. Instalação dos pacotes principais do Node.js:
+### 2. Instalação dos pacotes principais do Node.js:
 > sudo su
  npm install express --save
  npm install body-parser --save
@@ -21,7 +21,7 @@ Forum for a software engeneering class
  npm install -g jasmine-node
 
 
-###3. Instalação do banco de dados MongoDB
+### 3. Instalação do banco de dados MongoDB
 > sudo su
  apt-get install mongodb
  mkdir /data
@@ -35,7 +35,7 @@ depois:
  service mongodb start
 
 
-###4. Aplicação Hello World em Node.js:
+### 4. Aplicação Hello World em Node.js:
 Vamos criar, para fins de teste da instalação, uma aplicação tipo
 Hello World em Node.js:
 
