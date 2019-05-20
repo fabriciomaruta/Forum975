@@ -7,7 +7,10 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 // adicione "ponteiro" para o MongoDB
-var mongoOp = require('./models/mongo');
+var mongoOpUSers = require('./models/mongoUsers.js');
+var mongoOpAssuntos = require('./models/mongoAssuntos.js');
+var mongoOpPosts = require('./models/mongoPosts.js');
+var mongoOpComentarios = require('./models/mongoComentarios.j');
 
 var app = express();
 
@@ -50,8 +53,8 @@ app.use(function(err, req, res, next) {
 
 module.exports = app;
 
-// Funcoes de autenticacao
-// Incompleta
+// Funcoes de autenticacao *copiada*.
+// Alterar p/ buscar usuario e senha no banco
 function checkAuth(req, res) {
     cookies = req.cookies;
     if(!cookies || !cookies.userAuth) return 'unauthorized';
@@ -63,10 +66,10 @@ function checkAuth(req, res) {
     return 'unauthorized';
 }
 
-// codigo abaixo adicionado para o processamento das requisições
+// Processamento de requicisoes para cada rota
 // HTTP GET, POST, PUT, DELETE
 
-// alguns navegadores enviam uma requisicao OPTIONS antes de POST e PUT
+// Alguns navegadores enviam uma requisicao OPTIONS antes de POST e PUT
 router.route('/*') 
  .options(function(req, res) {  // OPTIONS
    res.header('Access-Control-Allow-Origin', '*');
@@ -95,55 +98,56 @@ router.route('/')
 
 router.route('/users'){
     .get(function(req,res){
+
     }
     )
     
     .post(function(req,res){
         var query = {"user": req.body.user};
         var response = {};
-        mongoOp.findOne(
-    })
+    }
+    );
 
 router.route('/users/:id'){
     .get(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-        }
+    }
 	)
     .post(function(req,res){
-		}
+	}
 	)
     .put(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-        }
+    }
 	)
     .delete(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-        }
+    }
     );
     
 router.route('/assuntos'){
     .get(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-        }
+    }
 	)
     .post(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-		}
+	}
 	)
     .put(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-        }
+    }
 	)
     .delete(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-        }
+    }
     );
  
 
@@ -151,42 +155,42 @@ router.route('/posts'){
     .get(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-        }
+    }
 	)
     .post(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-		}
+	}
 	)
     .put(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-        }
+    }
 	)
     .delete(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-        }
+    }
     );
 
 router.route('/posts/:id'){
     .get(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-        }
+    }
 	)
     .post(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-		}
+	}
 	)
     .put(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-        }
+    }
 	)
     .delete(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
-        }
+    }
     );
