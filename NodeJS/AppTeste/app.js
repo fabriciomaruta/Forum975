@@ -10,7 +10,7 @@ var bodyParser = require('body-parser');
 var mongoOpUSers = require('./models/mongoUsers.js');
 var mongoOpAssuntos = require('./models/mongoAssuntos.js');
 var mongoOpPosts = require('./models/mongoPosts.js');
-var mongoOpComentarios = require('./models/mongoComentarios.j');
+var mongoOpComentarios = require('./models/mongoComentarios.js');
 
 var app = express();
 
@@ -85,11 +85,11 @@ router.route('/')
         //manda pagina de login
         var auth = checkAuth(req,res);
         if(auth == 'unauthorized') {
-            var path = 'login.html'
+            var path = 'static/login.html'
             res.header('Cache-Control', 'no-cache');
             res.sendFile(path, {"root": "./"});
         } else {
-            var path = 'index.html'
+            var path = 'static/index.html'
             res.header('Cache-COntrol', 'no-cache');
             res.sendFile(path, {"root": "./"});
         }
