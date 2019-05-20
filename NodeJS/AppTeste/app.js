@@ -79,106 +79,116 @@ router.route('/')
    res.sendFile(path, {"root": "./"});
    }
  );
-router.route('/posts')
+
+
+
+router.route('/users/:id'){
     .get(function(req,res){
-	console.log("OIE");
-	response = {'oie':'oie'};
-	res.json(response);
-    }
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+        }
 	)
     .post(function(req,res){
-	response = {"data":"Adicionou data",
-		    "chegou": req.body,
-		   }
-	res.json(response)
-    }
-	 )
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+		}
+	)
     .put(function(req,res){
-	response = {"data":"You maybe altered something"}
-    }
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+        }
 	)
     .delete(function(req,res){
-	response = {"data":"Voce provavelmente deletou algo"}
-    }
-	   );
-
-router.route('/alunos')   // operacoes sobre todos os alunos
- .get(function(req, res) {  // GET
-     var response = {};
-     mongoOp.find({}, function(erro, data) {
-       if(erro) 
-          response = {"resultado": "falha de acesso ao BD"};
-        else
-          response = {"alunos": data};
-        res.json(response);
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
         }
-      )
-    }
-  )
-  .post(function(req, res) {   // POST (cria)
-     var query = {"ra": req.body.ra};
-     var response = {};
-     mongoOp.findOne(query, function(erro, data) {
-        if (data == null) {
-           var db = new mongoOp();
-           db.ra = req.body.ra;
-           db.nome = req.body.nome;
-           db.curso = req.body.curso;
-           db.cr = req.body.cr;
-           db.cp = req.body.cp;
-           db.save(function(erro) {
-             if(erro) response = {"resultado": "falha de acesso ao BD"};
-             else response = {"resultado": "aluno inserido"};
-             res.json(response);
-            }
-          )
-        } else {
-	    response = {"resultado": "aluno ja existente"};
-            res.json(response);
-          }
+    );
+    
+router.route('/assuntos'){
+    .get(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
         }
-      )
-    }
-  );
-
-
-router.route('/alunos/:ra')   // operacoes sobre um aluno (RA)
-  .get(function(req, res) {   // GET
-      var response = {};
-      var query = {"ra": req.params.ra};
-      mongoOp.findOne(query, function(erro, data) {
-         if(erro) response = {"resultado": "falha de acesso ao BD"};
-         else if (data == null) response = {"resultado": "aluno inexistente"};
-	 else response = {"alunos": [data]};
-         res.json(response);
+	)
+    .post(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+		}
+	)
+    .put(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
         }
-      )
-    }
-  )
-  .put(function(req, res) {   // PUT (altera)
-      var response = {};
-      var query = {"ra": req.params.ra};
-      var data = {"nome": req.body.nome, "curso": req.body.curso, "cp":req.body.cp, "cr":req.body.cr};
-      mongoOp.findOneAndUpdate(query, data, function(erro, data) {
-          if(erro) response = {"resultado": "falha de acesso ao DB"};
-	  else if (data == null) response = {"resultado": "aluno inexistente"};
-          else response = {"resultado": "aluno atualizado"};
-          res.json(response);  
+	)
+    .delete(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
         }
-      )
-    }
-  )
-  .delete(function(req, res) {   // DELETE (remove)
-     var response = {};
-     var query = {"ra": req.params.ra};
-      mongoOp.findOneAndRemove(query, function(erro, data) {
-         if(erro) response = {"resultado": "falha de acesso ao DB"};
-	 else if (data == null) response = {"resultado": "aluno inexistente"};
-         else response = {"resultado": "aluno removido"};
-         res.json(response);
-         }
-       )
-     }
-  );
+    );
+ 
 
+router.route('/posts'){
+    .get(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+        }
+	)
+    .post(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+		}
+	)
+    .put(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+        }
+	)
+    .delete(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+        }
+    );
 
+router.route('/posts/:id'){
+    .get(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+        }
+	)
+    .post(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+		}
+	)
+    .put(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+        }
+	)
+    .delete(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+        }
+    );
+
+router.route('/users/:id'){
+    .get(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+        }
+	)
+    .post(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+		}
+	)
+    .put(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+        }
+	)
+    .delete(function(req,res){
+        console.log(req.path);
+        console.log(JSON.stringify(req.body));
+        }
+    );
