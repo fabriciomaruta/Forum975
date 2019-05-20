@@ -9,10 +9,6 @@ var bodyParser = require('body-parser');
 // adicione "ponteiro" para o MongoDB
 var mongoOp = require('./models/mongo');
 
-// comente as duas linhas abaixo
-// var index = require('./routes/index');
-// var users = require('./routes/users');
-
 var app = express();
 
 // view engine setup
@@ -34,10 +30,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 var router = express.Router();
 app.use('/', router);   // deve vir depois de app.use(bodyParser...
 
-// comente as duas linhas abaixo
-// app.use('/', index);
-// app.use('/users', users);
-
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
@@ -58,6 +50,19 @@ app.use(function(err, req, res, next) {
 
 module.exports = app;
 
+// Funcoes de autenticacao
+// Incompleta
+function checkAuth(req, res) {
+    cookies = req.cookies;
+    if(!cookies || !cookies.userAuth) return 'unauthorized';
+    cauth = cookies.userAuth;
+    var content = JSON.parse(cauth);
+    var key = content.key;
+    var role = content.role;
+    if(key == 'secret') return role;
+    return 'unauthorized';
+}
+
 // codigo abaixo adicionado para o processamento das requisições
 // HTTP GET, POST, PUT, DELETE
 
@@ -69,18 +74,35 @@ router.route('/*')
    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Request-With');
    res.sendStatus(200);
    }
- );
+);
 
 // index.html
 router.route('/')
- .get(function(req, res) {  // GET
-   var path = 'index.html';
-   res.header('Cache-Control', 'no-cache');
-   res.sendFile(path, {"root": "./"});
-   }
- );
+    .get(function(req, res) {  // GET
+        //manda pagina de login
+        var auth = checkAuth(req,res);
+        if(auth == 'unauthorized') {
+            var path = 'login.html'
+            res.header('Cache-Control', 'no-cache');
+            res.sendFile(path, {"root": "./"});
+        } else {
+            var path = 'index.html'
+            res.header('Cache-COntrol', 'no-cache');
+            res.sendFile(path, {"root": "./"});
+        }
+    }
+    );
 
-
+router.route('/users'){
+    .get(function(req,res){
+    }
+    )
+    
+    .post(function(req,res){
+        var query = {"user": req.body.user};
+        var response = {};
+        mongoOp.findOne(
+    })
 
 router.route('/users/:id'){
     .get(function(req,res){
@@ -89,8 +111,6 @@ router.route('/users/:id'){
         }
 	)
     .post(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
 		}
 	)
     .put(function(req,res){
@@ -150,28 +170,6 @@ router.route('/posts'){
     );
 
 router.route('/posts/:id'){
-    .get(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-        }
-	)
-    .post(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-		}
-	)
-    .put(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-        }
-	)
-    .delete(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-        }
-    );
-
-router.route('/users/:id'){
     .get(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
