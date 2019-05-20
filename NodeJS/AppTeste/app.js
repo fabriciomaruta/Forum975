@@ -2,7 +2,6 @@
 
 var express = require('express');
 var path = require('path');
-//var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -80,6 +79,28 @@ router.route('/')
    res.sendFile(path, {"root": "./"});
    }
  );
+router.route('/posts')
+    .get(function(req,res){
+	console.log("OIE");
+	response = {'oie':'oie'};
+	res.json(response);
+    }
+	)
+    .post(function(req,res){
+	response = {"data":"Adicionou data",
+		    "chegou": req.body,
+		   }
+	res.json(response)
+    }
+	 )
+    .put(function(req,res){
+	response = {"data":"You maybe altered something"}
+    }
+	)
+    .delete(function(req,res){
+	response = {"data":"Voce provavelmente deletou algo"}
+    }
+	   );
 
 router.route('/alunos')   // operacoes sobre todos os alunos
  .get(function(req, res) {  // GET
