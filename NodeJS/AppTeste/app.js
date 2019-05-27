@@ -102,7 +102,23 @@ router.route('/')
         res.header('Cache-Control', 'no-cache');
         res.sendFile(path, {"root": "./"});
     }
-    );
+	);
+
+router.route('/login')
+    .post(function(req,res){
+	var login = {'login':req.body.login};
+	var password = {'password':req.body.password};
+	var response = {};
+	mongoOpUsers.findOne(login, function(erro,data){
+	    if(erro) response =  {"resultado":"Falha de acesso ao BD"}
+	    else if (data==null) = {"resultado":"Usuario nao encontrado"}
+	    else {
+		if(data.password == password) {
+		    console.log('To logado');
+		}
+	    }
+	});
+    }
 
 router.route('/cadastro')
     .get(function(req, res) {
@@ -110,7 +126,27 @@ router.route('/cadastro')
         res.header('Cache-Control', 'no-cache');
         res.sendFile(path, {"root": "./"});
     }
-    );
+	)
+	  .post(function(req,res){
+	      var login = {'login':req.body.login};
+	      mongoOpUsers.findOne(login, function(erro,data){
+		  if(erro) response = {"resultado":"Falha ao acessar BD"}
+		  else if (data == null){
+		      var db = new mongoOpUsers();
+		      db.login = req.body.login;
+		      db.password = req.body.password;
+		      db.nickname = req.body.nickname;
+		      db.name = req.body.name;
+		      db.save(function(erro){
+			  if (erro) response = {"resultado":"Falha ao inserir usuario no banco"};
+			  else response = {"resultado":"Usuario cadastrado"}
+			  res.json(response);
+		      })
+		  }
+		  else response = {"resultado":"usuario ja cadastrado !"}
+		  res.json(response);
+	      }	      
+	  });
 
 router.route('/users')
     .get(function(req,res){
