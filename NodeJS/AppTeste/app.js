@@ -53,18 +53,34 @@ app.use(function(err, req, res, next) {
 
 module.exports = app;
 
-// Funcoes de autenticacao *copiada*.
-// Alterar p/ buscar usuario e senha no banco
-function checkAuth(req, res) {
-    cookies = req.cookies;
-    if(!cookies || !cookies.userAuth) return 'unauthorized';
-    cauth = cookies.userAuth;
-    var content = JSON.parse(cauth);
-    var key = content.key;
-    var role = content.role;
-    if(key == 'secret') return role;
-    return 'unauthorized';
+
+// Serve a pagina de login
+function serveLogin(req, res) {
+	var path = 'static/login.html'
+	res.header('Cache-Control', 'no-cache');
+	res.sendFile(path, {"root": "./"});
 }
+
+// Verifica a autenticacao e serve a pagina de login caso a autenticacao
+// nao seja verificada.
+var checkAuth = function (req, res, next) {
+	cookies = req.cookies;
+	if(!cookies || !cookies.userAuth) serveLogin(req, res)
+	else {
+		cauth = cookies.userAuth;
+		var content = JSON.parse(cauth);
+		var key = content.key;
+	    var role = content.role;
+	    if(key == 'secret') next();
+        else serveLogin(req,res);
+    }
+}
+
+// Antes de toda rota, verificar se o usuario esta cadastrado
+router.use(function (req, res, next) {
+    if(req.path == '/cadastro' || req.path == '/login') next();
+    else checkAuth(req, res, next);
+});
 
 // Processamento de requicisoes para cada rota
 // HTTP GET, POST, PUT, DELETE
@@ -82,17 +98,17 @@ router.route('/*')
 // index.html
 router.route('/')
     .get(function(req, res) {  // GET
-        //manda pagina de login
-        var auth = checkAuth(req,res);
-        if(auth == 'unauthorized') {
-            var path = 'static/login.html'
-            res.header('Cache-Control', 'no-cache');
-            res.sendFile(path, {"root": "./"});
-        } else {
-            var path = 'static/index.html'
-            res.header('Cache-COntrol', 'no-cache');
-            res.sendFile(path, {"root": "./"});
-        }
+        var path = 'static/index.html'
+        res.header('Cache-Control', 'no-cache');
+        res.sendFile(path, {"root": "./"});
+    }
+    );
+
+router.route('/cadastro')
+    .get(function(req, res) {
+        var path = 'static/cadastro.html'
+        res.header('Cache-Control', 'no-cache');
+        res.sendFile(path, {"root": "./"});
     }
     );
 
@@ -103,8 +119,6 @@ router.route('/users')
     )
     
     .post(function(req,res){
-        var query = {"user": req.body.user};
-        var response = {};
     }
     );
 
