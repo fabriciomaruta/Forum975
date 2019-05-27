@@ -96,7 +96,7 @@ router.route('/')
     }
     );
 
-router.route('/users'){
+router.route('/users')
     .get(function(req,res){
 
     }
@@ -108,7 +108,7 @@ router.route('/users'){
     }
     );
 
-router.route('/users/:id'){
+router.route('/users/:id')
     .get(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
@@ -128,7 +128,7 @@ router.route('/users/:id'){
     }
     );
     
-router.route('/assuntos'){
+router.route('/assuntos')
     .get(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
@@ -151,7 +151,7 @@ router.route('/assuntos'){
     );
  
 
-router.route('/posts'){
+router.route('/posts')
     .get(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
@@ -173,7 +173,7 @@ router.route('/posts'){
     }
     );
 
-router.route('/posts/:id'){
+router.route('/posts/:id')
     .get(function(req,res){
         console.log(req.path);
         console.log(JSON.stringify(req.body));
