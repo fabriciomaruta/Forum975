@@ -30,6 +30,7 @@
                 $scope.nickname == undefined) {
                 
                 alert("Preencha todos os campos!");
+                
                 return;
             }
             var data = {"user": $scope.user,
@@ -37,14 +38,17 @@
                         "password": $scope.password,
                         "nickname": $scope.nickname};
             var request = $http({"method": "post",
-                                 "url": "/users",
+                                 "url": "http://localhost:3000/users",
                                  "data": data});
             request.success(function(reply) {
-                alert("Deu bom!");
+              window.location.replace('http://localhost:3000/login')
+              console.log(reply)
+
             }
             );
             request.error(function(reply) {
-                alert("Deu ruim!");
+              console.log(reply)
+              alert("Usuario ja cadastrado");
             }
             );
         }

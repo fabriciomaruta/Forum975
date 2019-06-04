@@ -8,11 +8,39 @@
 <form>
   Login: <input type="text" maxlength="36" ng-model="login"><br><br>
   Senha: <input type="password" maxlength="36" ng-model="password"><br><br>
-  <button ng-click="">Login</button> &nbsp;
+  <button ng-click="consultaLogin()">Login</button> &nbsp;
 </form>
 <br><br>
 <a href="/cadastro">Cadastre-se</a>
 </div>
+<script>
+	var app = angular.module('myApp', []);
+	app.controller('myCtrl', function($scope, $http){
+		$scope.consultaLogin = function(){
+			var url = "http://localhost:3000/login";
+			if ($scope.login == undefined ||
+				$scope.password == undefined){
+				alert("Preencha todos os campos!");
+				return;
+			}
+			var data = {
+				"login": $scope.login,
+				"password": $scope.password
+			};
+			var request = $http({"method":"post",
+											"url": url,
+											"data":data});
+			request.success(function(reply){
+				alert("LOGOU")
+				//window.location.replace('http://localhost:3000/users')
+				
+			});
 
+			request.error(function(reply){
+				alert("Usuario e senha invalidos !")
+			});
+		}
+	})
+</script>
 </body>
 </html>
