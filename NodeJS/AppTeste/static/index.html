@@ -17,8 +17,8 @@
 	<th class="tg-0lax"><h3>Numero de posts</h3></th>
   </tr>
   <tr ng-repeat="x in assuntos">
-    <th class="tg-0lax"><a href="/assuntos/{{x.id}}">{{x.nome}}</a></th>
-    <th class="tg-0lax">{{x.nDePosts}}</th>
+    <th class="tg-0lax"><a href="/assuntos/{{x.id}}">{{x.name}}</a></th>
+    <th class="tg-0lax">{{x.numberOfPosts}}</th>
   </tr>
 </table>
 
@@ -30,7 +30,7 @@
 <script>
 var app = angular.module('myApp', []);
 app.controller('myCtrl', function($scope, $http) {
-    $http.get("/users")
+    $http.get("/assuntos")
     .then(function (response) {$scope.assuntos = response.data.assuntos;});
 
     $scope.addAssunto = function(){
@@ -38,7 +38,7 @@ app.controller('myCtrl', function($scope, $http) {
       var data = {
         "assunto" : $scope.assunto
       }
-      var request = $https({
+      var request = $http({
         "method":"post",
         "url":url,
         "data":data
