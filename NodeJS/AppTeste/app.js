@@ -171,145 +171,62 @@ router.route('/cadastro')
         var path = 'static/cadastro.html'
         res.header('Cache-Control', 'no-cache');
         res.sendFile(path, {"root": "./"});
-    }
-);
-
-
-
-router.route('/users')
-    .get(function(req, res) {  // GET
-    //if(! checkAuth(req, res)) return;
-    //var path = 'static/index.html'
-    //res.header('Cache-Control', 'no-cache');
-    //res.sendFile(path, {"root": "./"});
-     var response = {};
-     mongoOpUsers.find({}, function(erro, data) {
-       if(erro)
-          response = {"resultado": "Falha de acesso ao BD"};
-        else
-          response = {"alunos": data};
-          res.json(response);
-        }
-      )
-    }
-    )
+    })
 
     .post(function(req,res){
         var user = {'user':req.body.user};
         var response = '';
         mongoOpUsers.findOne(user, function(erro,data){
-        if(erro) {
-            response = {"resultado":"Falha ao acessar BD"}
-            res.statusCode = 500;
-            res.json(response);
-            
+            if(erro) {
+                response = {"resultado":"Falha ao acessar BD"}
+                console.log("hahahah1");
+                res.statusCode = 500;
+                res.json(response);
+                
+            }
+            else if (data == null){
+                var db = new mongoOpUsers();
+                db.user = req.body.user;
+                db.password = req.body.password;
+                db.nickname = req.body.nickname;
+                db.name = req.body.name;
+                db.save(function(erro){
+                    if (erro) response = {"resultado":"Falha ao inserir usuario no banco"};
+                    else response = {"resultado":"Usuario cadastrado"}
+                    console.log(response);
+                    console.log("hahahah");
+                    res.statusCode = 200;
+                    res.json(response);
+                })
+            }
+            else {
+                response = {"resultado":"Usuario existente"}
+                console.log(response);
+                console.log("hahahah2");
+                res.statusCode = 400;
+                res.json(response);
+            }
         }
-        else if (data == null){
-            var db = new mongoOpUsers();
-            db.user = req.body.user;
-            db.password = req.body.password;
-            db.nickname = req.body.nickname;
-            db.name = req.body.name;
-            db.save(function(erro){
-            if (erro) response = {"resultado":"Falha ao inserir usuario no banco"};
-            else response = {"resultado":"Usuario cadastrado"}
-            res.statusCode = 200;
-            res.json(response);
-            
-            })
-        }
-        else {
-            response = {"resultado":"Usuario existente"}
-            res.statusCode = 400;
-            res.json(response);
-        }
-
-        })
-    });                    
-    
-router.route('/users/:id')
-    .get(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-    }
-	)
-    .post(function(req,res){
-	}
-	)
-    .put(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-    }
-	)
-    .delete(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-    }
-    );
-    
-router.route('/assuntos')
-    .get(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-    }
-	)
-    .post(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-	}
-	)
-    .put(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-    }
-	)
-    .delete(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-    }
-    );
- 
-
-router.route('/posts')
-    .get(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-    }
-	)
-    .post(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-	}
-	)
-    .put(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-    }
-	)
-    .delete(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
+        )
     }
     );
 
-router.route('/posts/:id')
-    .get(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-    }
-	)
-    .post(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-	}
-	)
-    .put(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
-    }
-	)
-    .delete(function(req,res){
-        console.log(req.path);
-        console.log(JSON.stringify(req.body));
+
+
+router.route('/users')
+    .get(function(req, res) {  // GET
+    if(! checkAuth(req, res)) return;
+    var path = 'static/index.html'
+    res.header('Cache-Control', 'no-cache');
+    res.sendFile(path, {"root": "./"});
+    var response = {};
+    mongoOpUsers.find({}, function(erro, data) {
+        if(erro)
+            response = {"resultado": "Falha de acesso ao BD"};
+        else
+            response = {"alunos": data};
+            res.json(response);
+        }
+        )
     }
     );
