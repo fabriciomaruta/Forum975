@@ -34,7 +34,21 @@ app.controller('myCtrl', function($scope, $http) {
     .then(function (response) {$scope.assuntos = response.data.assuntos;});
 
     $scope.addAssunto = function(){
-      var url = "http://localhost:3000/assunto";
+      var url = "http://localhost:3000/assuntos";
+      var data = {
+        "assunto" : $scope.assunto
+      }
+      var request = $https({
+        "method":"post",
+        "url":url,
+        "data":data
+      })
+      request.success(function(reply){
+        window.location.reload()
+      });
+      request.error(function(reply){
+        alert("Deu ruim na insercao no DB")
+      })
       
     }
 });
