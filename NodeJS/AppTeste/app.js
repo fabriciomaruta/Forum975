@@ -175,3 +175,50 @@ router.route('/cadastro')
         )
     }
     );
+
+router.route('/assuntos')
+    .get(function(req, res) {
+        mongoOpAssuntos.find({}, function(erro,data) {
+            if(erro) {
+                response = {"resultado":"Falha ao acessar BD"}
+                res.statusCode = 500;
+                res.json(response);
+            }
+            else {
+                response = {"assuntos": data};
+                res.json(response);
+            }
+        })
+    })
+
+    .post(function(req,res) {
+        var assunto = {'assunto':req.body.assunto};
+        var responde = '';
+        mongoOpAssuntos.findOne(assunto, function(erro,data) {
+            if(erro) {
+                response = {"resultado":"Falha ao acessar BD"}
+                res.statusCode = 500;
+                res.json(response);
+            }
+            else if (data == null){
+                var db = new mongoOpAssuntos();
+                db.name = req.body.assunto;
+                db.numberOfPosts = 0;
+                db.save(function(erro){
+                    if (erro) response = {"resultado":"Falha ao inserir assunto no banco"};
+                    else response = {"resultado":"Assunto cadastrado"}
+                    res.statusCode = 200;
+                    res.json(response);
+                })
+            }
+            else {
+                response = {"resultado":"Assunto existente"}
+                res.statusCode = 400;
+                res.json(response);
+            }
+        }
+        )
+    }
+    );
+ 
+
