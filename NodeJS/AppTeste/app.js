@@ -54,6 +54,8 @@ app.use(function(err, req, res, next) {
 module.exports = app;
 
 
+// Processamento de requicisoes para cada rota HTTP GET, POST, PUT, DELETE
+ 
 // Verifica a autenticacao e serve a pagina de login caso a autenticacao
 // nao seja verificada.
 var checkAuth = function (req, res, next) {
@@ -76,9 +78,6 @@ router.use(function (req, res, next) {
         next();
     }
 });
-
-// Processamento de requicisoes para cada rota
-// HTTP GET, POST, PUT, DELETE
 
 // Alguns navegadores enviam uma requisicao OPTIONS antes de POST e PUT
 router.route('/*') 

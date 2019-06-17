@@ -5,14 +5,20 @@
 
 <div ng-app="myApp" ng-controller="myCtrl"> 
 <h1> Assuntos</h1>
-<table>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+</style>
+<table class="tg">
   <tr>
-	<td><h3>Assunto</h3></td>
-	<td><h3>Numero de posts</h3></td>
+	<th class="tg-0lax"><h3>Assunto</h3></th>
+	<th class="tg-0lax"><h3>Numero de posts</h3></th>
   </tr>
   <tr ng-repeat="x in assuntos">
-    <td><a href="/assuntos/{{x.id}}">{{x.nome}}</a></td>
-    <td>{{x.nDePosts}}</td>
+    <th class="tg-0lax"><a href="/assuntos/{{x.id}}">{{x.nome}}</a></th>
+    <th class="tg-0lax">{{x.nDePosts}}</th>
   </tr>
 </table>
 
