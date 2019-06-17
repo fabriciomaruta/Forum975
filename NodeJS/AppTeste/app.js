@@ -54,26 +54,9 @@ app.use(function(err, req, res, next) {
 module.exports = app;
 
 
-// Serve a pagina de login
-function serveLogin(req, res) {
-	var path = 'static/login.html'
-	//res.header('Cache-Control', 'no-cache');
-	res.sendFile(path, {"root": "./"});
-}
-
 // Verifica a autenticacao e serve a pagina de login caso a autenticacao
 // nao seja verificada.
 var checkAuth = function (req, res, next) {
-    // cookies = req.cookies;
-    // if(! cookies || ! cookies.userAuth) return 'unauthorized';
-    // cauth = cookies.userAuth;
-    // var content = JSON.parse(cauth);
-    // var key = content.key;
-    // var role = content.role;
-    // if(key == 'secret') return role
-    // else serveLogin(req,res);
-
-
     cookies = req.cookies;
     var key = '';
     if(cookies) key = cookies.userAuth;
@@ -81,17 +64,6 @@ var checkAuth = function (req, res, next) {
     if(key == 'secret') return true;
     res.sendFile('static/login.html', {"root": "./"});
     return false;
-//	cookies = req.cookies;
-//	if(!cookies || !cookies.userAuth) serveLogin(req, res)
-//	else {
-//		cauth = cookies.userAuth;
-//		var content = JSON.parse(cauth);
-//		var key = content.key;
-//	    var role = content.role;
-	//    if(key == 'secret') next();
-  //      else serveLogin(req,res);
-    //}
-    //next();
 }
 
 // Antes de toda rota, verificar se o usuario esta cadastrado
@@ -121,7 +93,7 @@ router.route('/*')
 // index.html
 router.route('/')
     .get(function(req, res) {  // GET
-        var path = 'static/login.html'
+        var path = 'static/index.html'
         res.header('Cache-Control', 'no-cache');
         res.sendFile(path, {"root": "./"});
     }
@@ -179,10 +151,8 @@ router.route('/cadastro')
         mongoOpUsers.findOne(user, function(erro,data){
             if(erro) {
                 response = {"resultado":"Falha ao acessar BD"}
-                console.log("hahahah1");
                 res.statusCode = 500;
                 res.json(response);
-                
             }
             else if (data == null){
                 var db = new mongoOpUsers();
@@ -193,39 +163,15 @@ router.route('/cadastro')
                 db.save(function(erro){
                     if (erro) response = {"resultado":"Falha ao inserir usuario no banco"};
                     else response = {"resultado":"Usuario cadastrado"}
-                    console.log(response);
-                    console.log("hahahah");
                     res.statusCode = 200;
                     res.json(response);
                 })
             }
             else {
                 response = {"resultado":"Usuario existente"}
-                console.log(response);
-                console.log("hahahah2");
                 res.statusCode = 400;
                 res.json(response);
             }
-        }
-        )
-    }
-    );
-
-
-
-router.route('/users')
-    .get(function(req, res) {  // GET
-    if(! checkAuth(req, res)) return;
-    var path = 'static/index.html'
-    res.header('Cache-Control', 'no-cache');
-    res.sendFile(path, {"root": "./"});
-    var response = {};
-    mongoOpUsers.find({}, function(erro, data) {
-        if(erro)
-            response = {"resultado": "Falha de acesso ao BD"};
-        else
-            response = {"alunos": data};
-            res.json(response);
         }
         )
     }
