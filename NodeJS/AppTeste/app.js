@@ -172,14 +172,17 @@ router.route('/cadastro')
         res.header('Cache-Control', 'no-cache');
         res.sendFile(path, {"root": "./"});
     }
-	);
+);
 
 
 
 router.route('/users')
     .get(function(req, res) {  // GET
-     if(! checkAuth(req, res)) return;
-     var response = {};
+    if(! checkAuth(req, res)) return;
+    var path = 'static/index.html'
+    res.header('Cache-Control', 'no-cache');
+    res.sendFile(path, {"root": "./"});
+     /*var response = {};
      mongoOpUsers.find({}, function(erro, data) {
        if(erro)
           response = {"resultado": "Falha de acesso ao BD"};
@@ -187,7 +190,7 @@ router.route('/users')
           response = {"alunos": data};
           res.json(response);
         }
-      )
+      )*/
     }
     )
 
