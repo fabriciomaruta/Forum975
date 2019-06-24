@@ -205,9 +205,14 @@ router.route('/assuntos')
                 db.name = req.body.assunto;
                 db.numberOfPosts = 0;
                 db.save(function(erro){
-                    if (erro) response = {"resultado":"Falha ao inserir assunto no banco"};
-                    else response = {"resultado":"Assunto cadastrado"}
-                    res.statusCode = 200;
+                    if (erro) {
+			response = {"resultado":"Falha ao inserir assunto no banco"};
+			res.statusCode = 500;
+		    }
+                    else {
+			response = {"resultado":"Assunto cadastrado"}
+			res.statusCode = 200;
+		    }
                     res.json(response);
                 })
             }

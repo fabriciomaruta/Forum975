@@ -42,9 +42,8 @@ app.controller('myCtrl', function($scope, $http) {
         "method":"post",
         "url":url,
         "data":data
-      })
-      request.success(function(reply){
-        window.location.reload()
+      }).then(function(reply){
+       window.location.replace('http://localhost:3000/')
       });
       request.error(function(reply){
         alert("Deu ruim na insercao no DB")
