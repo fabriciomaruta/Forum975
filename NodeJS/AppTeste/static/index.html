@@ -4,27 +4,48 @@
 <body>
 
 <div ng-app="myApp" ng-controller="myCtrl"> 
-<h1> Assuntos</h1>
 <style type="text/css">
 .tg  {border-collapse:collapse;border-spacing:0;}
 .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
 .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
 .tg .tg-0lax{text-align:left;vertical-align:top}
-</style>
+</style>    
+
+<h1> Assuntos</h1>
+
 <table class="tg">
-  <tr>
-	<th class="tg-0lax"><h3>Assunto</h3></th>
-	<th class="tg-0lax"><h3>Numero de posts</h3></th>
-  </tr>
-  <tr ng-repeat="x in assuntos">
-    <th class="tg-0lax"><a href="/assuntos/{{x.id}}">{{x.name}}</a></th>
-    <th class="tg-0lax">{{x.numberOfPosts}}</th>
-  </tr>
+    <tr>
+        <th class="tg-0lax"><h3>Assunto</h3></th>
+        <th class="tg-0lax"><h3>Numero de posts</h3></th>
+    </tr>
+    <tr ng-repeat="x in assuntos">
+        <th class="tg-0lax"><a href="#" ng-click="getPostsFromAssunto({{x._id}})">{{x.name}}</a></th>
+        <th class="tg-0lax">{{x.numberOfPosts}}</th>
+    </tr>
 </table>
 
 <br><br>
 <input type="text" placeholder="Coloque o assunto" maxlength="36" ng-model="assunto">
 <button ng-click="addAssunto()">Criar novo assunto !</button>
+
+<h1> Posts</h1>
+<table class="tg">
+    <tr>
+        <th class="tg-0lax"><h3>Post</h3></th>
+        <th class="tg-0lax"><h3>Autor</h3></th>
+        <th class="tg-0lax"><h3>Numero de comentarios</h3></th>
+    </tr>
+    <tr ng-repeat="x in posts">
+        <th class="tg-0lax"><a href="#" ng-click="getPost({{x._id}})">{{x.name}}</a></th>
+        <th class="tg-0lax">{{x.author}}</th>
+        <th class="tg-0lax">{{x.numberOfComments}}</th>
+    </tr>
+</table>
+
+<br><br>
+<input type="text" placeholder="Coloque o assunto" maxlength="36" ng-model="assunto">
+<button ng-click="addAssunto()">Criar novo assunto !</button> 
+
 </div>
 
 <script>
@@ -48,8 +69,21 @@ app.controller('myCtrl', function($scope, $http) {
       request.error(function(reply){
         alert("Deu ruim na insercao no DB")
       })
-      
     }
+
+    $scope.getPostsFromAssunto = function(id){
+        var url = "http://localhost:3000/assuntos/" + id;
+        var request = $http({
+        "method":"get",
+        "url":url,
+        }).then(function(reply){
+            $scope.posts = reply.data;
+        });
+        request.error(function(reply){
+            alert("Deu ruim pegar os posts")
+        })
+        }     
+
 });
 </script>
 

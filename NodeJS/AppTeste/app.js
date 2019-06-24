@@ -206,13 +206,13 @@ router.route('/assuntos')
                 db.numberOfPosts = 0;
                 db.save(function(erro){
                     if (erro) {
-			response = {"resultado":"Falha ao inserir assunto no banco"};
-			res.statusCode = 500;
-		    }
+                        response = {"resultado":"Falha ao inserir assunto no banco"};
+                        res.statusCode = 500;
+                    }
                     else {
-			response = {"resultado":"Assunto cadastrado"}
-			res.statusCode = 200;
-		    }
+                        response = {"resultado":"Assunto cadastrado"}
+                        res.statusCode = 200;
+                    }
                     res.json(response);
                 })
             }
@@ -225,5 +225,20 @@ router.route('/assuntos')
         )
     }
     );
- 
 
+router.route('/assuntos/:id')
+    .get(function(req, res) {
+        mongoOpPosts.find(req.params.id, function(erro,data) {
+            if(erro) {
+                response = {"resultado":"Falha ao acessar BD"}
+                res.statusCode = 500;
+                res.json(response);
+            }
+            else {
+                response = {"posts": data}
+                res.statusCode = 200;
+                res.json(response);
+            }
+        })
+    }
+    );
