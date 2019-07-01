@@ -6,5 +6,6 @@ var postsSchema = new Schema({
     "content": String,
     "owner": String,
     "comments":Array,
+    "assunto": String,
 });
 module.exports = conn3.model('posts', postsSchema);

@@ -242,3 +242,54 @@ router.route('/assuntos/:id')
         })
     }
     );
+
+router.route('/posts')
+    .get(function(req, res) {
+        mongoOpPosts.find({}, function(erro,data) {
+            if(erro) {
+                response = {"resultado":"Falha ao acessar BD"}
+                res.statusCode = 500;
+                res.json(response);
+            }
+            else {
+                response = {"posts": data};
+                res.json(response);
+            }
+        })
+    })
+
+    .post(function(req,res) {
+        var post = {'post':req.body.post};
+        var responde = '';
+        mongoOpPosts.findOne(post, function(erro,data) {
+            if(erro) {
+                response = {"resultado":"Falha ao acessar BD"}
+                res.statusCode = 500;
+                res.json(response);
+            }
+            else if (data == null){
+                var db = new mongoOpPosts();
+                db.name = req.body.name;
+                db.content = req.body.content;
+                db.save(function(erro){
+                    if (erro) {
+                        response = {"resultado":"Falha ao inserir assunto no banco"};
+                        res.statusCode = 500;
+                    }
+                    else {
+                        response = {"resultado":"Post cadastrado"}
+                        res.statusCode = 200;
+                    }
+                    res.json(response);
+                })
+            }
+            else {
+                response = {"resultado":"Post existente"}
+                res.statusCode = 400;
+                res.json(response);
+            }
+        }
+        )
+    }
+    );
+

@@ -9,6 +9,50 @@
 .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
 .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
 .tg .tg-0lax{text-align:left;vertical-align:top}
+/* Dropdown Button */
+.dropbtn {
+  background-color: #3498DB;
+  color: white;
+  padding: 16px;
+  font-size: 12px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Dropdown button on hover & focus */
+.dropbtn:hover, .dropbtn:focus {
+  background-color: #2980B9;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #ddd}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;}
 </style>    
 
 <h1> Assuntos</h1>
@@ -25,8 +69,9 @@
 </table>
 
 <br><br>
-<input type="text" placeholder="Coloque o assunto" maxlength="36" ng-model="assunto">
-<button ng-click="addAssunto()">Criar novo assunto !</button>
+<input type="text" placeholder="Coloque o assunto" maxlength="36" ng-model="assunto"><br>
+<br>
+<button class="dropbtn" ng-click="addAssunto()">Criar novo assunto !</button>
 
 <h1> Posts</h1>
 <table class="tg">
@@ -36,23 +81,74 @@
         <th class="tg-0lax"><h3>Numero de comentarios</h3></th>
     </tr>
     <tr ng-repeat="x in posts">
-        <th class="tg-0lax"><a href="#" ng-click="getPost({{x._id}})">{{x.name}}</a></th>
+        <th class="tg-0lax"><a href="#" ng-click="getPosts({{x._id}})">{{x.name}}</a></th>
         <th class="tg-0lax">{{x.author}}</th>
         <th class="tg-0lax">{{x.numberOfComments}}</th>
     </tr>
 </table>
 
 <br><br>
-<input type="text" placeholder="Coloque o assunto" maxlength="36" ng-model="assunto">
-<button ng-click="addAssunto()">Criar novo assunto !</button> 
+<input type="text" placeholder="Coloque o título do post" maxlength="36" ng-model="postName"><br><br>
 
+<textarea rows="4" cols="50" ng-model="postContent">
+Coloque o conteudo do post.
+</textarea>
+<input type="text" placeholder="Coloque o conteudo do post" maxlength="36" ng-model="postContent"><br><br>
+
+
+<div class="dropdown">
+  <button  onclick="myFunction()" class="dropbtn">Escolha um assunto</button>
+  <div id="myDropdown" class="dropdown-content">
+    <a href="#">Link 1</a>
+    <a href="#">Link 2</a>
+    <a href="#">Link 3</a>
+  </div>
 </div>
+</div>
+<br><br>
+<button ng-click="addPost()" class="dropbtn">Criar novo Post !</button> 
 
 <script>
+function myFunction() {
+  document.getElementById("myDropdown").classList.toggle("show");
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
+
 var app = angular.module('myApp', []);
 app.controller('myCtrl', function($scope, $http) {
     $http.get("/assuntos")
     .then(function (response) {$scope.assuntos = response.data.assuntos;});
+
+    $scope.addPost = function(){
+      var url = "http://localhost:3000/posts";
+      var data = {
+        "name" : $scope.postName,
+        "content": $scope.postContent,
+      }
+      var request = $http({
+        "method":"post",
+        "url":url,
+        "data":data
+      }).then(function(reply){
+       window.location.replace('http://localhost:3000/')
+      });
+      request.error(function(reply){
+        alert("Deu ruim na insercao no DB")
+      })
+    }    
 
     $scope.addAssunto = function(){
       var url = "http://localhost:3000/assuntos";
