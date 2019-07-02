@@ -4,7 +4,6 @@ var Schema = mongoose.Schema;
 var postsSchema = new Schema({
     "name": String,
     "content": String,
-    "owner": String,
     "comments":Array,
     "assunto": String,
 });
