@@ -5,6 +5,11 @@
 
 <div ng-app="myApp" ng-controller="myCtrl"> 
 <style type="text/css">
+  ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
 .tg  {border-collapse:collapse;border-spacing:0;}
 .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
 .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
@@ -54,6 +59,11 @@
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
 .show {display:block;}
 </style>    
+<ul>
+  <li><a href="#">Logout</a></li>
+
+</ul>
+
 
 <h1> Assuntos</h1>
 
@@ -89,21 +99,14 @@
 
 <br><br>
 <input type="text" placeholder="Coloque o título do post" maxlength="36" ng-model="postName"><br><br>
-
+<div>
+    <input type="text" placeholder= "Coloque o nome do assunto" ng-model="assuntoName"></input>
+</div><br>
 <textarea rows="4" cols="50" ng-model="postContent">
-Coloque o conteudo do post.
-</textarea>
-<input type="text" placeholder="Coloque o conteudo do post" maxlength="36" ng-model="postContent"><br><br>
+"Coloque o conteudo do post."
+</textarea><br>
 
 
-<div class="dropdown">
-  <button  onclick="myFunction()" class="dropbtn">Escolha um assunto</button>
-  <div id="myDropdown" class="dropdown-content">
-    <a href="#">Link 1</a>
-    <a href="#">Link 2</a>
-    <a href="#">Link 3</a>
-  </div>
-</div>
 </div>
 <br><br>
 <button ng-click="addPost()" class="dropbtn">Criar novo Post !</button> 
