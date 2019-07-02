@@ -73,7 +73,7 @@
         <th class="tg-0lax"><h3>Numero de posts</h3></th>
     </tr>
     <tr ng-repeat="x in assuntos">
-        <th class="tg-0lax"><a href="#" ng-click="getPostsFromAssunto({{x._id}})">{{x.name}}</a></th>
+        <th class="tg-0lax"><a href="#" ng-click="getPosts(x)">{{x.name}}</a></th>
         <th class="tg-0lax">{{x.numberOfPosts}}</th>
     </tr>
 </table>
@@ -91,7 +91,7 @@
         <th class="tg-0lax"><h3>Numero de comentarios</h3></th>
     </tr>
     <tr ng-repeat="x in posts">
-        <th class="tg-0lax"><a href="#" ng-click="getPosts({{x._id}})">{{x.name}}</a></th>
+        <th class="tg-0lax"><a href="#" ng-click="">{{x.name}}</a></th>
         <th class="tg-0lax">{{x.author}}</th>
         <th class="tg-0lax">{{x.numberOfComments}}</th>
     </tr>
@@ -132,11 +132,16 @@ app.controller('myCtrl', function($scope, $http) {
         "url":url,
         "data":data
       }).then(function(reply){
+        console.log(reply);
+        if(reply.response == "Assunto nao existente"){
+          alert('Assunto nao existente')
+        }
        window.location.replace('http://localhost:3000/')
-      });
-      request.error(function(reply){
-        alert("Deu ruim na insercao no DB")
+      }).catch(function(error){
+        alert("ASsunto nao exoiste")
       })
+      
+      
     }    
 
     $scope.addAssunto = function(){
@@ -156,13 +161,27 @@ app.controller('myCtrl', function($scope, $http) {
       })
     }
 
+    $scope.getPosts = function(assunto){
+        var AssuntoName = assunto.name
+        var url = "http://localhost:3000/posts/" + AssuntoName;
+        var request = $http({
+        "method":"get",
+        "url":url,
+        }).then(function(reply){
+            $scope.posts = reply.data.posts;
+            console.log(reply.data)
+        });
+        
+        }     
+
+
     $scope.getPostsFromAssunto = function(id){
         var url = "http://localhost:3000/assuntos/" + id;
         var request = $http({
         "method":"get",
         "url":url,
         }).then(function(reply){
-            $scope.posts = reply.data;
+            $scope.assuntos = reply.data;
         });
         request.error(function(reply){
             alert("Deu ruim pegar os posts")

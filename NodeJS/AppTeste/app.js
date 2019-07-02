@@ -242,6 +242,22 @@ router.route('/assuntos/:id')
         })
     }
     );
+router.route('/posts/:assunto')
+    .get(function(req, res) {
+        mongoOpPosts.find({"assunto":req.params.assunto}, function(erro,data) {
+            if(erro) {
+                response = {"resultado":"Falha ao acessar BD"}
+                res.statusCode = 500;
+                res.json(response);
+            }
+            else {
+                response = {"posts": data}
+                res.statusCode = 200;
+                res.json(response);
+            }
+        })
+    }
+    );
 
 router.route('/posts')
     .get(function(req, res) {
@@ -259,9 +275,28 @@ router.route('/posts')
     })
 
     .post(function(req,res) {
-        var post = {'post':req.body.post};
+        var post = {'post':req.body.name};
+        var assunt = {'assunto': req.body.assunto};
         var responde = '';
-        mongoOpPosts.findOne(post, function(erro,data) {
+        var cont = 0 ;
+        mongoOpAssuntos.findOne(assunt, function(erro,data){
+            if(erro){
+                response = {"resultado":"Falha ao acessar BD"}
+                res.statusCode = 500;
+                cont = 1;
+            
+
+            }
+            if (data == null){
+                response = {"resultado":"Assunto nao existente"}
+                res.statusCode = 404;
+                cont = 1;
+                                
+            }
+        });
+        if(cont == 0){
+            mongoOpPosts.findOne(post, function(erro,data) {
+            console.log('SAlve')
             if(erro) {
                 response = {"resultado":"Falha ao acessar BD"}
                 res.statusCode = 500;
@@ -271,6 +306,7 @@ router.route('/posts')
                 var db = new mongoOpPosts();
                 db.name = req.body.name;
                 db.content = req.body.content;
+                db.assunto = req.body.assunto;
                 db.save(function(erro){
                     if (erro) {
                         response = {"resultado":"Falha ao inserir assunto no banco"};
@@ -279,17 +315,24 @@ router.route('/posts')
                     else {
                         response = {"resultado":"Post cadastrado"}
                         res.statusCode = 200;
+                        
                     }
-                    res.json(response);
+
+                    
                 })
             }
             else {
-                response = {"resultado":"Post existente"}
+                response = {"resultado":"Post existente", "data": data}
                 res.statusCode = 400;
                 res.json(response);
             }
+            }
+            )
         }
-        )
+        
+        
+        res.json(response);
+        
     }
     );
 
