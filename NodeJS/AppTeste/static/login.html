@@ -6,7 +6,7 @@
   <br>
   <div ng-app="myApp" ng-controller="myCtrl">
 <form>
-  Login: <input type="text" maxlength="36" ng-model="login"><br><br>
+  Login: <input type="text" maxlength="36" ng-model="user"><br><br>
   Senha: <input type="password" maxlength="36" ng-model="password"><br><br>
   <button ng-click="consultaLogin()">Login</button> &nbsp;
 </form>
@@ -18,26 +18,25 @@
 	app.controller('myCtrl', function($scope, $http){
 		$scope.consultaLogin = function(){
 			var url = "http://localhost:3000/login";
-			if ($scope.login == undefined ||
+			if ($scope.user == undefined ||
 				$scope.password == undefined){
 				alert("Preencha todos os campos!");
 				return;
 			}
 			var data = {
-				"login": $scope.login,
+				"user": $scope.user,
 				"password": $scope.password
 			};
 			var request = $http({"method":"post",
 	                                "url": url,
-					"data":data});
-			request.success(function(reply){
-				window.location.replace('http://localhost:3000/')
-				
-			});
-
-			request.error(function(reply){
-				alert("Usuario e senha invalidos !")
-			});
+                                    "data":data});
+            request.success(function(reply){
+                if(!reply.info) {
+                    window.location.replace('http://localhost:3000/')
+                } else {
+                    alert(reply.info);
+                }
+            });
 		}
 	})
 </script>

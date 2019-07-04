@@ -8,7 +8,7 @@
 <form>
   User: <input type="user" maxlength="36" ng-model="user"><br><br>
 
-  Nome completo: <input type="nome" maxlength="36" ng-model="nome"><br><br>
+  Nome completo: <input type="name" maxlength="36" ng-model="name"><br><br>
 
   Nickname: <input type="nickname" maxlength="36" ng-model="nickname"><br><br>
 
@@ -24,7 +24,7 @@
 
         $scope.insertUser = function() {
             if ($scope.user == undefined ||
-                $scope.nome == undefined ||
+                $scope.name == undefined ||
                 $scope.password == undefined ||
                 $scope.nickname == undefined) {
                 
@@ -33,22 +33,18 @@
                 return;
             }
             var data = {"user": $scope.user,
-                        "nome": $scope.nome,
+                        "name": $scope.name,
                         "password": $scope.password,
                         "nickname": $scope.nickname};
             var request = $http({"method": "post",
                                  "url": "http://localhost:3000/cadastro",
                                  "data": data});
             request.success(function(reply) {
-              window.location.replace('http://localhost:3000/login')
-              alert('Usuario Cadastrado !')
-              console.log(reply)
-
-            }
-            );
-            request.error(function(reply) {
-              console.log(reply)
-              alert("Usuario ja cadastrado");
+                if(!reply.info) {
+                    window.location.replace('http://localhost:3000/login')
+                } else {
+                    alert(reply.info);
+                }
             }
             );
         }

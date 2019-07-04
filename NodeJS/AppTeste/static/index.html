@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 <body>
 
 <div ng-app="myApp" ng-controller="myCtrl"> 
@@ -60,30 +60,34 @@
 .show {display:block;}
 </style>    
 <ul>
-  <li><a href="#">Logout</a></li>
+  <li><a href="#" ng-click="logout()">Logout</a></li>
 
 </ul>
 
 
 <h1> Assuntos</h1>
 
+<h3> Assuntos existentes </h3>
 <table class="tg">
     <tr>
         <th class="tg-0lax"><h3>Assunto</h3></th>
         <th class="tg-0lax"><h3>Numero de posts</h3></th>
     </tr>
     <tr ng-repeat="x in assuntos">
-        <th class="tg-0lax"><a href="#" ng-click="getPosts(x)">{{x.name}}</a></th>
+        <th class="tg-0lax"><a href="#" ng-click="getPostsFromAssunto(x)">{{x.name}}</a></th>
         <th class="tg-0lax">{{x.numberOfPosts}}</th>
     </tr>
 </table>
 
-<br><br>
+<h3> Criar novo assunto </h3>
 <input type="text" placeholder="Coloque o assunto" maxlength="36" ng-model="assunto"><br>
 <br>
-<button class="dropbtn" ng-click="addAssunto()">Criar novo assunto !</button>
+<button class="dropbtn" ng-click="addAssunto()">Criar novo assunto!</button>
+ 
 
 <h1> Posts</h1>
+
+<h3> Posts do assunto selecionado</h3>
 <table class="tg">
     <tr>
         <th class="tg-0lax"><h3>Post</h3></th>
@@ -91,22 +95,49 @@
         <th class="tg-0lax"><h3>Numero de comentarios</h3></th>
     </tr>
     <tr ng-repeat="x in posts">
-        <th class="tg-0lax"><a href="#" ng-click="">{{x.name}}</a></th>
+        <th class="tg-0lax"><a href="#" ng-click="getCommentsFromPost(x)">{{x.name}}</a></th>
         <th class="tg-0lax">{{x.author}}</th>
         <th class="tg-0lax">{{x.numberOfComments}}</th>
     </tr>
 </table>
 
-<br><br>
-
+<h3> Criar novo post no assunto selecionado</h3>
 <input type="text" placeholder="Coloque o título do post" maxlength="36" ng-model="postName"><br><br>
-<div>
-    <input type="text" placeholder= "Coloque o nome do assunto" ng-model="assuntoName"></input>
-</div><br>
 <textarea rows="4" cols="50" ng-model="postContent">
 "Coloque o conteudo do post."
 </textarea><br>
-<button ng-click="addPost()" >Criar novo Post !</button> 
+<button class="dropbtn" ng-click="addPost()" >Criar novo post!</button> 
+ 
+
+<h1>Comentários</h1>
+
+<h3> Comentários do post selecionado </h3>
+<table class="tg">
+    <tr>
+        <th class="tg-0lax"><h3>Autor</h3></th>
+        <th class="tg-0lax"><h3>Escreveu...</h3></th>
+    </tr>
+    <tr>
+        <th class="tg-0lax">{{postAuthor}}</th>
+        <th class="tg-0lax">{{postContent}}</th>
+    </tr>
+    <tr>
+        <th class="tg-0lax"><h3>Autor</h3></th>
+        <th class="tg-0lax"><h3>Comentou...</h3></th>
+    </tr>
+    <tr ng-repeat="x in comments">
+        <th class="tg-0lax">{{x.author}}</a></th>
+        <th class="tg-0lax">{{x.content}}</th>
+    </tr>
+</table>
+
+<h3> Criar um novo comentario no post selecionado </h3>
+<textarea rows="4" cols="50" ng-model="commentContent">
+"Coloque o conteudo do comentário."
+</textarea><br>
+<button class="dropbtn" ng-click="addComment()" >Criar novo comentário!</button> 
+ 
+
 
 
 </div>
@@ -117,76 +148,107 @@
 
 var app = angular.module('myApp', []);
 app.controller('myCtrl', function($scope, $http) {
+
+    var currentAssunto;
+    var currentPost;
+
     $http.get("/assuntos")
     .then(function (response) {$scope.assuntos = response.data.assuntos;});
 
-    $scope.addPost = function(){
-      var url = "http://localhost:3000/posts";
-      var data = {
-        "name" : $scope.postName,
-        "content": $scope.postContent,
-        "assunto": $scope.assuntoName,
-      }
-      var request = $http({
-        "method":"post",
-        "url":url,
-        "data":data
-      }).then(function(reply){
-        console.log(reply);
-        if(reply.response == "Assunto nao existente"){
-          alert('Assunto nao existente')
-        }
-       window.location.replace('http://localhost:3000/')
-      }).catch(function(error){
-        alert("ASsunto nao exoiste")
-      })
-      
-      
-    }    
-
     $scope.addAssunto = function(){
-      var url = "http://localhost:3000/assuntos";
-      var data = {
-        "assunto" : $scope.assunto
-      }
-      var request = $http({
-        "method":"post",
-        "url":url,
-        "data":data
-      }).then(function(reply){
-       window.location.replace('http://localhost:3000/')
-      });
-      request.error(function(reply){
-        alert("Deu ruim na insercao no DB")
-      })
+        var url = "http://localhost:3000/assuntos";
+        var data = {
+            "assunto" : $scope.assunto
+        }
+        var request = $http({"method":"post",
+                             "url":url,
+                             "data":data});
+        request.success(function(reply) {
+            if(!reply.info) {
+                window.location.replace('http://localhost:3000/')
+            } else {
+                alert(reply.info);
+            }
+        });
     }
 
-    $scope.getPosts = function(assunto){
+    $scope.getPostsFromAssunto = function(assunto){
         var AssuntoName = assunto.name
         var url = "http://localhost:3000/posts/" + AssuntoName;
         var request = $http({
         "method":"get",
         "url":url,
         }).then(function(reply){
+            currentAssunto = assunto
             $scope.posts = reply.data.posts;
-            console.log(reply.data)
         });
-        
-        }     
+    }     
 
+    $scope.addPost = function(){
+        if(!currentAssunto) {
+            alert("Nenhum assunto selecionado!");
+        } else {
+            var url = "http://localhost:3000/posts";
+            var data = {
+                "name" : $scope.postName,
+                "content": $scope.postContent,
+                "assunto": currentAssunto.name,
+            }
+            var request = $http({"method":"post",
+                                 "url":url,
+                                 "data":data});
+            request.success(function(reply) {
+                if(!reply.info) {
+                    $scope.getPostsFromAssunto(currentAssunto);
+                    $http.get("/assuntos")
+                    .then(function (response) {$scope.assuntos = response.data.assuntos;});
+                } else {
+                    alert(reply.info);
+                }
+            });
+        }
+    }
 
-    $scope.getPostsFromAssunto = function(id){
-        var url = "http://localhost:3000/assuntos/" + id;
+    $scope.getCommentsFromPost = function(post){
+        var postId = post._id;
+        var url = "http://localhost:3000/comentarios/" + postId;
         var request = $http({
         "method":"get",
         "url":url,
         }).then(function(reply){
-            $scope.assuntos = reply.data;
+            currentPost = post;
+            $scope.postAuthor = post.author;
+            $scope.postContent = post.content;
+            $scope.comments = reply.data.comments;
         });
-        request.error(function(reply){
-            alert("Deu ruim pegar os posts")
-        })
-        }     
+    }     
+
+    $scope.addComment = function() {
+        if(!currentPost) {
+            alert("Nenhum post selecionado!");
+        } else {
+            var url = "http://localhost:3000/comentarios";
+            var data = {
+                "content": $scope.commentContent,
+                "postId": currentPost._id,
+            }
+            var request = $http({"method":"post",
+                                 "url":url,
+                                 "data":data});
+            request.success(function(reply) {
+                if(!reply.info) {
+                    $scope.getCommentsFromPost(currentPost);
+                    $scope.getPostsFromAssunto(currentAssunto);
+                } else {
+                    alert(reply.info);
+                }
+            });
+        }
+    }
+
+    $scope.logout = function() {
+    }
+
 
 });
 </script>

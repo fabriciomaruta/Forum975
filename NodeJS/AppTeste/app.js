@@ -54,32 +54,27 @@ app.use(function(err, req, res, next) {
 module.exports = app;
 
 
-// Processamento de requicisoes para cada rota HTTP GET, POST, PUT, DELETE
- 
-// Verifica a autenticacao e serve a pagina de login caso a autenticacao
-// nao seja verificada.
+// Checks auth cookie and serves login page if user is not authenticated
 var checkAuth = function (req, res, next) {
     cookies = req.cookies;
     var key = '';
-    if(cookies) key = cookies.userAuth;
-    console.log(key)
+    if(cookies && cookies.userAuth) key = JSON.parse(req.cookies.userAuth).key;
     if(key == 'secret') return true;
     res.sendFile('static/login.html', {"root": "./"});
     return false;
 }
 
-// Antes de toda rota, verificar se o usuario esta cadastrado
+// Before every route that is not registration and login, checks user auth
 router.use(function (req, res, next) {
     if(req.path == '/cadastro' || req.path == '/login') next();
-    else if(!checkAuth(req, res, next)){
+    else if(!checkAuth(req, res, next)) {
         return;
-    }
-    else{
+    } else {
         next();
     }
 });
 
-// Alguns navegadores enviam uma requisicao OPTIONS antes de POST e PUT
+// Some browsers send OPTIONS before POST and PUT 
 router.route('/*') 
  .options(function(req, res) {  // OPTIONS
    res.header('Access-Control-Allow-Origin', '*');
@@ -89,86 +84,95 @@ router.route('/*')
    }
 );
 
-// index.html
+// index.html route
 router.route('/')
     .get(function(req, res) {  // GET
         var path = 'static/index.html'
+
         res.header('Cache-Control', 'no-cache');
         res.sendFile(path, {"root": "./"});
     }
 	);
 
+// Login page routes
 router.route('/login')
+    // Gets login static page
     .get(function(req, res) {  // GET
         var path = 'static/login.html'
         res.header('Cache-Control', 'no-cache');
         res.sendFile(path, {"root": "./"});
     })    
 
-    .post(function(req,res){
-        var login = {'user':req.body.login};
+    // Route for user trying to login
+    .post(function(req,res) {
+        var userName = req.body.user;
         var response = '';
-        console.log(login)
-        mongoOpUsers.findOne(login, function(erro,data){
-            console.log(data)
-            if(erro){
-                response = {'info': 'Falha ao acessar DB'}
-                res.statusCode = 500;
+        mongoOpUsers.findOne({user: userName}, function(err,data) {
+            if(err) res.sendStatus(500);
+
+            // User is not registered
+            else if (data == null) {
+                response = {"info": "Usuario nao cadastrado!"};
+                res.statusCode = 200;
                 res.json(response);
             }
-            else if (data == null){
-                response = {'info': 'Usuario nao cadastrado'}
-                res.statusCode = 401;
-                res.json(response);
-            }
-            else{
-                if(data.password == req.body.password){
-                    console.log('LOGOU')
-                    res.cookie('userAuth', 'secret', {'maxAge': 3600000*24*5});
-                    response = {'info': 'Logou !!'}
+
+            // Found user
+            else {
+                // If user and password combo checks out
+                if(data.password == req.body.password) {
+                    res.cookie('userAuth', 
+                               JSON.stringify({"key": "secret", "user": userName}), 
+                               {'maxAge': 3600000*24*5});
+                    response = {}
                     res.statusCode = 200;
                     res.json(response);
-                }else{
-                    response = {'info': 'Senha invalida'}
-                    res.statusCode = 401;
-                    res.json(response)
+                
+                // Invalid password
+                } else {
+                    response = {"info": "Senha incorreta!"};
+                    res.statusCode = 200;
+                    res.json(response);
                 }
             }
         })
 	});
 
+// Registration page routes
 router.route('/cadastro')
+    // Gets registration static page
     .get(function(req, res) {
         var path = 'static/cadastro.html'
         res.header('Cache-Control', 'no-cache');
         res.sendFile(path, {"root": "./"});
     })
 
-    .post(function(req,res){
+    // Registrates a new user
+    .post(function(req,res) {
         var user = {'user':req.body.user};
         var response = '';
-        mongoOpUsers.findOne(user, function(erro,data){
-            if(erro) {
-                response = {"resultado":"Falha ao acessar BD"}
-                res.statusCode = 500;
-                res.json(response);
-            }
-            else if (data == null){
-                var db = new mongoOpUsers();
-                db.user = req.body.user;
-                db.password = req.body.password;
-                db.nickname = req.body.nickname;
-                db.name = req.body.name;
-                db.save(function(erro){
-                    if (erro) response = {"resultado":"Falha ao inserir usuario no banco"};
-                    else response = {"resultado":"Usuario cadastrado"}
-                    res.statusCode = 200;
-                    res.json(response);
+        mongoOpUsers.findOne(user, function(err,data) {
+            if(err) res.sendStatus(500);
+            // User does not exist - creates new user
+            else if (data == null) {
+                var newUser = new mongoOpUsers();
+                newUser.user = req.body.user;
+                newUser.password = req.body.password;
+                newUser.nickname = req.body.nickname;
+                newUser.name = req.body.name;
+                newUser.save(function(err) {
+                    if (err) {
+                        res.sendStatus(500);
+                    } else { 
+                        response = {}
+                        res.statusCode = 200;
+                        res.json(response);
+                    }
                 })
-            }
-            else {
-                response = {"resultado":"Usuario existente"}
-                res.statusCode = 400;
+            // User already exists
+            } else {
+                response = {"info": "Usuario já existe!"};
+                res.statusCode = 200;
                 res.json(response);
             }
         }
@@ -176,49 +180,45 @@ router.route('/cadastro')
     }
     );
 
+// Routes to "assuntos" resource, aka forum topics
 router.route('/assuntos')
+
+    // Gets all assuntos
     .get(function(req, res) {
-        mongoOpAssuntos.find({}, function(erro,data) {
-            if(erro) {
-                response = {"resultado":"Falha ao acessar BD"}
-                res.statusCode = 500;
-                res.json(response);
-            }
+        mongoOpAssuntos.find({}, function(err,data) {
+            if(err) res.sendStatus(500);
             else {
                 response = {"assuntos": data};
+                res.statusCode = 200;
                 res.json(response);
             }
         })
     })
 
+    // Creates new assunto
     .post(function(req,res) {
         var assunto = {'assunto':req.body.assunto};
-        var responde = '';
-        mongoOpAssuntos.findOne(assunto, function(erro,data) {
-            if(erro) {
-                response = {"resultado":"Falha ao acessar BD"}
-                res.statusCode = 500;
-                res.json(response);
-            }
-            else if (data == null){
-                var db = new mongoOpAssuntos();
-                db.name = req.body.assunto;
-                db.numberOfPosts = 0;
-                db.save(function(erro){
-                    if (erro) {
-                        response = {"resultado":"Falha ao inserir assunto no banco"};
-                        res.statusCode = 500;
-                    }
+        var response = '';
+        mongoOpAssuntos.findOne({name: assunto.assunto}, function(err,data) {
+            if(err) res.sendStatus(500);
+            // Assunto does not exist - create it
+            else if (data == null) {
+                var newAssunto = new mongoOpAssuntos();
+                newAssunto.name = req.body.assunto;
+                newAssunto.numberOfPosts = 0;
+                newAssunto.save(function(err) {
+                    if (err) res.sendStatus(500);
                     else {
-                        response = {"resultado":"Assunto cadastrado"}
+                        response = {}
                         res.statusCode = 200;
+                        res.json(response);
                     }
-                    res.json(response);
                 })
-            }
-            else {
-                response = {"resultado":"Assunto existente"}
-                res.statusCode = 400;
+
+            // Assunto already exists
+            } else {
+                response = {"info": "Assunto já existe!"};
+                res.statusCode = 200;
                 res.json(response);
             }
         }
@@ -226,29 +226,12 @@ router.route('/assuntos')
     }
     );
 
-router.route('/assuntos/:id')
-    .get(function(req, res) {
-        mongoOpPosts.find(req.params.id, function(erro,data) {
-            if(erro) {
-                response = {"resultado":"Falha ao acessar BD"}
-                res.statusCode = 500;
-                res.json(response);
-            }
-            else {
-                response = {"posts": data}
-                res.statusCode = 200;
-                res.json(response);
-            }
-        })
-    }
-    );
+// Route to get all posts from one assunto
 router.route('/posts/:assunto')
     .get(function(req, res) {
-        mongoOpPosts.find({"assunto":req.params.assunto}, function(erro,data) {
-            if(erro) {
-                response = {"resultado":"Falha ao acessar BD"}
-                res.statusCode = 500;
-                res.json(response);
+        mongoOpPosts.find({"assunto":req.params.assunto}, function(err,data) {
+            if(err) {
+                res.sendStatus(500);
             }
             else {
                 response = {"posts": data}
@@ -258,14 +241,18 @@ router.route('/posts/:assunto')
         })
     }
     );
+ 
 
+// Route to create new posts
 router.route('/posts')
+    // for debug only
     .get(function(req, res) {
-        mongoOpPosts.find({}, function(erro,data) {
-            if(erro) {
-                response = {"resultado":"Falha ao acessar BD"}
-                res.statusCode = 500;
-                res.json(response);
+        mongoOpPosts.find({}, function(err,data) {
+            if(err) {
+                //response = {"resultado":"Falha ao acessar BD"}
+                //res.statusCode = 500;
+                //res.json(response);
+                res.sendStatus(500);
             }
             else {
                 response = {"posts": data};
@@ -274,65 +261,134 @@ router.route('/posts')
         })
     })
 
+    // Creates new post
     .post(function(req,res) {
-        var post = {'post':req.body.name};
-        var assunt = {'assunto': req.body.assunto};
-        var responde = '';
-        var cont = 0 ;
-        mongoOpAssuntos.findOne(assunt, function(erro,data){
-            if(erro){
-                response = {"resultado":"Falha ao acessar BD"}
-                res.statusCode = 500;
-                cont = 1;
-            
-
+        var postName = req.body.name
+        var assuntoName = req.body.assunto
+        mongoOpAssuntos.findOne({name: assuntoName}, function(err,assuntoData) {
+            if(err) {
+                res.sendStatus(500);
             }
-            if (data == null){
-                response = {"resultado":"Assunto nao existente"}
-                res.statusCode = 404;
-                cont = 1;
-                                
-            }
-        });
-        if(cont == 0){
-            mongoOpPosts.findOne(post, function(erro,data) {
-            console.log('SAlve')
-            if(erro) {
-                response = {"resultado":"Falha ao acessar BD"}
-                res.statusCode = 500;
+            // Posts "assunto" does not exist;
+            else if (assuntoData == null) {
+                response = {"info": "Assunto nao existe!"}
+                res.statusCode = 200;
                 res.json(response);
             }
-            else if (data == null){
-                var db = new mongoOpPosts();
-                db.name = req.body.name;
-                db.content = req.body.content;
-                db.assunto = req.body.assunto;
-                db.save(function(erro){
-                    if (erro) {
-                        response = {"resultado":"Falha ao inserir assunto no banco"};
-                        res.statusCode = 500;
+            // If posts "assunto" exists...
+            else {
+                mongoOpPosts.findOne({assunto: assuntoName, name: postName}, function(err,postData) {
+                    if(err) {
+                        res.sendStatus(500);
                     }
-                    else {
-                        response = {"resultado":"Post cadastrado"}
+                    // Creates posts, getting user name from cookie and updating "assuntos" n. of posts
+                    else if (postData == null) {
+                        var newPost = new mongoOpPosts();
+                        cookies = req.cookies;
+                        newPost.name = req.body.name;
+                        newPost.content = req.body.content;
+                        newPost.assunto = req.body.assunto;
+                        newPost.numberOfComments = 0;
+                        if(cookies && cookies.userAuth) newPost.author = JSON.parse(req.cookies.userAuth).user;
+                        newPost.save(function(err) {
+                            if (err) {
+                                req.sendStatus(500);
+                            } else {
+                                assuntoData.numberOfPosts = assuntoData.numberOfPosts+1
+                                assuntoData.save(function (err) {
+                                    if(err) {
+                                        req.sendstatus(500);
+                                    } else {
+                                        response = {}
+                                        res.statusCode = 200;
+                                        res.json(response);
+                                    }
+                                });
+                            }
+                        })
+                    // Post is duplicated
+                    } else {
+                        response = {"info":"Post duplicado!"}
                         res.statusCode = 200;
-                        
+                        res.json(response);
                     }
-
-                    
                 })
             }
+        })
+    });
+
+// Route to get all comments from a post
+router.route('/comentarios/:id')
+    .get(function(req, res) {
+        mongoOpPosts.find({_id:req.params.id}, function(err, data) {
+            if(err)
+        mongoOpComentarios.find({postId:req.params.id}, function(err,data) {
+            if(err) {
+                res.sendStatus(500);
+            }
             else {
-                response = {"resultado":"Post existente", "data": data}
-                res.statusCode = 400;
+                response = {"comments": data}
+                res.statusCode = 200;
                 res.json(response);
             }
-            }
-            )
-        }
-        
-        
-        res.json(response);
-        
+        })
     }
     );
+ 
+// Route to create new comments
+router.route('/comentarios')
+    // for debug only
+    .get(function(req, res) {
+        mongoOpComentarios.find({}, function(err,data) {
+            if(err) {
+                res.sendStatus(500);
+            }
+            else {
+                response = {"comments": data};
+                res.json(response);
+            }
+        })
+    })
 
+    // Creates new comment
+    .post(function(req,res) {
+        var postId = req.body.postId
+        
+        mongoOpPosts.findOne({_id: postId}, function(err,postData) {
+            if(err) {
+                res.sendStatus(500);
+            }
+            // Comments post does not exist
+            else if (postData == null) {
+                response = {"info": "Post nao existe!"}
+                res.statusCode = 200;
+                res.json(response);
+            }
+            // If comments post exist
+            else {
+                // Creates comment, getting user name from cookie and updating "post" n. of comments
+                var newComment = new mongoOpComentarios();
+                cookies = req.cookies;
+                newComment.content = req.body.content;
+                newComment.postId = req.body.postId;
+                if(cookies && cookies.userAuth) newComment.author = JSON.parse(req.cookies.userAuth).user;
+                newComment.save(function(err) {
+                    if (err) {
+                        res.sendStatus(500);
+                    } else {
+                        postData.numberOfComments = postData.numberOfComments+1
+                        postData.save(function (err) {
+                            if(err) {
+                                res.sendStatus(500);
+                            } else {
+                                response = {}
+                                res.statusCode = 200;
+                                res.json(response);
+                            }
+                        });
+                    }
+                })
+            }
+        })
+    });
+ 
