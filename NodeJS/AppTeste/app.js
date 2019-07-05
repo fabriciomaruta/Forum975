@@ -321,19 +321,19 @@ router.route('/posts')
 router.route('/comentarios/:id')
     .get(function(req, res) {
         mongoOpPosts.find({_id:req.params.id}, function(err, data) {
-            if(err)
-        mongoOpComentarios.find({postId:req.params.id}, function(err,data) {
-            if(err) {
-                res.sendStatus(500);
-            }
-            else {
-                response = {"comments": data}
-                res.statusCode = 200;
-                res.json(response);
-            }
-        })
-    }
-    );
+            if(err) {}
+            mongoOpComentarios.find({postId:req.params.id}, function(err,data) {
+                if(err) {
+                    res.sendStatus(500);
+                }
+                else {
+                    response = {"comments": data}
+                    res.statusCode = 200;
+                    res.json(response);
+                }
+            })
+        });
+    })
  
 // Route to create new comments
 router.route('/comentarios')
@@ -353,7 +353,6 @@ router.route('/comentarios')
     // Creates new comment
     .post(function(req,res) {
         var postId = req.body.postId
-        
         mongoOpPosts.findOne({_id: postId}, function(err,postData) {
             if(err) {
                 res.sendStatus(500);
