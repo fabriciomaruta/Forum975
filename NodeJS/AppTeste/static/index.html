@@ -87,7 +87,7 @@
 
 <h1> Posts</h1>
 
-<h3> Posts do assunto selecionado</h3>
+<h3> Posts do assunto {{currentAssunto.name}}</h3>
 <table class="tg">
     <tr>
         <th class="tg-0lax"><h3>Post</h3></th>
@@ -101,7 +101,7 @@
     </tr>
 </table>
 
-<h3> Criar novo post no assunto selecionado</h3>
+<h3> Criar novo post no assunto {{currentAssunto.name}}</h3>
 <input type="text" placeholder="Coloque o título do post" maxlength="36" ng-model="postName"><br><br>
 <textarea rows="4" cols="50" ng-model="postContent">
 "Coloque o conteudo do post."
@@ -111,15 +111,15 @@
 
 <h1>Comentários</h1>
 
-<h3> Comentários do post selecionado </h3>
+<h3> Comentários do post {{currentPost.name}} </h3>
 <table class="tg">
     <tr>
         <th class="tg-0lax"><h3>Autor</h3></th>
         <th class="tg-0lax"><h3>Escreveu...</h3></th>
     </tr>
     <tr>
-        <th class="tg-0lax">{{postAuthor}}</th>
-        <th class="tg-0lax">{{postContent}}</th>
+        <th class="tg-0lax">{{currentPost.author}}</th>
+        <th class="tg-0lax">{{currentPost.content}}</th>
     </tr>
     <tr>
         <th class="tg-0lax"><h3>Autor</h3></th>
@@ -131,7 +131,7 @@
     </tr>
 </table>
 
-<h3> Criar um novo comentario no post selecionado </h3>
+<h3> Criar um novo comentario no post {{currentPost.name}} </h3>
 <textarea rows="4" cols="50" ng-model="commentContent">
 "Coloque o conteudo do comentário."
 </textarea><br>
@@ -180,6 +180,7 @@ app.controller('myCtrl', function($scope, $http) {
         "url":url,
         }).then(function(reply){
             currentAssunto = assunto
+            $scope.currentAssunto = assunto
             $scope.posts = reply.data.posts;
         });
     }     
@@ -217,8 +218,7 @@ app.controller('myCtrl', function($scope, $http) {
         "url":url,
         }).then(function(reply){
             currentPost = post;
-            $scope.postAuthor = post.author;
-            $scope.postContent = post.content;
+            $scope.currentPost = post;
             $scope.comments = reply.data.comments;
         });
     }     
